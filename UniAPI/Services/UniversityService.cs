@@ -1,7 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using UniAPI.Authorization.Policy;
 using UniAPI.Entites;
 using UniAPI.Exceptions;
 using UniAPI.Models;
@@ -12,11 +16,18 @@ namespace UniAPI.Services
     {
         private readonly UniversityDbContext _dbContext;
         private readonly IMapper _mapper;
+        private readonly ILogger<UniversityService> _logger;
+        private readonly IAuthorizationService _authorizationservice;
+        private readonly IUserContextService _userContextService;
 
-        public UniversityService(UniversityDbContext dbContext, IMapper mapper)
+        public UniversityService(UniversityDbContext dbContext, IMapper mapper, ILogger<UniversityService> logger,
+            IAuthorizationService authorizationservice, IUserContextService userContextService)
         {
             _dbContext = dbContext;
             _mapper = mapper;
+            _logger = logger;
+            _authorizationservice = authorizationservice;
+            _userContextService = userContextService;
         }
 
 
@@ -57,6 +68,7 @@ namespace UniAPI.Services
         public int Create(CreateUniversityDto dto)
         {
             var uni = _mapper.Map<University>(dto);
+            uni.CreateById = _userContextService.GetUserId;
             _dbContext.Universities.Add(uni);
             _dbContext.SaveChanges();
 
@@ -72,6 +84,15 @@ namespace UniAPI.Services
             {
                 throw new NotFoundException("Restaurant not found");
             }
+            var auto = _authorizationservice.AuthorizeAsync(_userContextService.User, uni, new ResourceOperationRequirement(ResourcOperation.Delete)).Result;
+
+
+            if (!auto.Succeeded)
+            {
+                throw new ForbidExeption("");
+            }
+
+
 
             _dbContext.Universities.Remove(uni);
             _dbContext.SaveChanges();
@@ -79,6 +100,8 @@ namespace UniAPI.Services
 
         public void Update(int id, UpdateUniversityDto dto)
         {
+
+
             var uni = _dbContext
                 .Universities
                 .FirstOrDefault(u => u.Id == id);
@@ -86,6 +109,15 @@ namespace UniAPI.Services
             if (uni is null)
             {
                 throw new NotFoundException("Restaurant not found");
+            }
+
+
+            var auto = _authorizationservice.AuthorizeAsync(_userContextService.User, uni, new ResourceOperationRequirement(ResourcOperation.Update)).Result;
+
+
+            if (!auto.Succeeded)
+            {
+                throw new ForbidExeption("");
             }
 
             uni.Name = dto.Name;

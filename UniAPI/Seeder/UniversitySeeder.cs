@@ -33,6 +33,15 @@ namespace UniAPI.Seeder
                     _dbContext.Universities.AddRange(uni);
                     _dbContext.SaveChanges();
                 }
+
+
+                if (!_dbContext.Students.Any())
+                {
+                    var stu = GetStudents();
+                    _dbContext.Students.AddRange(stu);
+                    _dbContext.SaveChanges();
+                }
+
             }
 
         }
@@ -59,9 +68,80 @@ namespace UniAPI.Seeder
 
             return rol;
         }
+        private IEnumerable<Student> GetStudents()
+        {
+            var stu = new List<Student>
+            {
+                new Student()
+                                {
+                                    Title="Mgr",
+                                    FirstName="Tomek",
+                                    LastName="Kołodzejek",
+                                    IndexNumber=209603,
+                                    PESEL="0541518441",
+                                    Specialization="Stara Bartka",
+                                    YearOfStudies=4,
+                                    Address = new Address()
+                                    {
+
+                                    }
+
+                                },
+                new Student()
+                                {
+                                    Title="Inż",
+                                    FirstName="Kris",
+                                    LastName="Rumucki",
+                                    IndexNumber=79796,
+                                    PESEL="0194918441",
+                                    Specialization="Twoja Stara",
+                                    YearOfStudies=1,
+                                    Address = new Address()
+                                    {
+
+                                    }
+
+                                },
+                new Student()
+                                {
+                                    Title="Inż",
+                                    FirstName="Krzysztof",
+                                    LastName="Góral",
+                                    IndexNumber=109609,
+                                    PESEL="00222804075",
+                                    Specialization="Back End dotnet",
+                                    YearOfStudies=4,
+                                    Address = new Address()
+                                    {
+
+                                    }
+
+                                },
+                                new Student()
+                                {
+                                    Title="Inż",
+                                    FirstName="Kornel",
+                                    LastName="Gołebiewski",
+                                    IndexNumber=109606,
+                                    PESEL="0194918441",
+                                    Specialization="Twoja Stara",
+                                    YearOfStudies=4,
+                                    Address = new Address()
+                                    {
+
+                                    }
+
+                                }
+
+            };
+            return stu;
+
+        } 
+            
+            
         private IEnumerable<University> GetUniversities()
         {
-            var Uni = new List<University>()
+            var uni = new List<University>()
             {
                 new University()
                 {
@@ -126,10 +206,7 @@ namespace UniAPI.Seeder
                             Name="Informatyka",
                             Students = new List<Student>
                             {
-                                new Student()
-                                {
-
-                                }
+                                
                             },
                             Teachers = new List<Teacher>
                             {
@@ -169,10 +246,7 @@ namespace UniAPI.Seeder
                             Name="Architektura",
                             Students = new List<Student>
                             {
-                                new Student()
-                                {
-
-                                }
+                                
                             },
                             Teachers = new List<Teacher>
                             {
@@ -212,10 +286,7 @@ namespace UniAPI.Seeder
                             Name="Elektyka",
                             Students = new List<Student>
                             {
-                                new Student()
-                                {
-
-                                }
+                               
                             },
                             Teachers = new List<Teacher>
                             {
@@ -239,7 +310,7 @@ namespace UniAPI.Seeder
             };
 
 
-            return Uni;
+            return uni;
         }
         
 

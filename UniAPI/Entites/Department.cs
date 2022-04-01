@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace UniAPI.Entites
 {
@@ -6,7 +7,9 @@ namespace UniAPI.Entites
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        [EmailAddress]
         public string ContactEmail { get; set; }
+        [Phone]
         public string ContactNumber { get; set; }
         public int UniversityId { get; set; }
         public virtual Department Departments { get; set; }

@@ -1,37 +1,35 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Security.Claims;
 using UniAPI.Models;
 using UniAPI.Services;
 
 namespace UniAPI.Controllers
 {
 
-    [Route("api/university")]
+    [Route("api/student")]
     [ApiController]
-    public class UniversityController:ControllerBase
+    [Authorize]
+    public class StudentController : ControllerBase
     {
-        private readonly IUniversityService _service;
+        private readonly IStudentService _service;
        
 
-        public UniversityController(IUniversityService service)
+        public StudentController(IStudentService service)
         {
             _service = service;
         }
 
         [HttpGet]
-        [Authorize(Policy = "HasNationality")]
-        public ActionResult<IEnumerable<UniversityDto>> GetAll()
+        [AllowAnonymous]
+        public ActionResult<IEnumerable<StudentDto>> GetAll()
         {
-
-
             var uni = _service.GetAll();
             return Ok(uni);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<UniversityDto> GetOne([FromRoute] int id)
+        public ActionResult<StudentDto> GetOne([FromRoute] int id)
         {
             var uni = _service.GetById(id);
 
@@ -39,6 +37,7 @@ namespace UniAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles ="Admin,Manage")]
         public ActionResult Delete([FromRoute]int id)
         {
             _service.Delete(id);
@@ -47,16 +46,16 @@ namespace UniAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateRestaurant([FromBody] CreateUniversityDto dto)
+        public ActionResult CreateStudent([FromBody] CreateStudentDto dto)
         {
-            var userId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+         
             var id = _service.Create(dto);
 
-            return Created($"/api/university/{id}",null);
+            return Created($"/api/student/{id}",null);
         }
 
         [HttpPut("{id}")]
-        public ActionResult Update([FromBody]UpdateUniversityDto dto,[FromRoute] int id)
+        public ActionResult Update([FromBody]UpdateStudentDto dto,[FromRoute] int id)
         {
            
             _service.Update(id, dto);

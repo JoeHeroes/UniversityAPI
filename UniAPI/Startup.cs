@@ -1,5 +1,6 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UniAPI.Authorization;
+using UniAPI.Authorization.Policy;
 using UniAPI.Entites;
 using UniAPI.Middleware;
 using UniAPI.Models;
@@ -33,13 +35,13 @@ namespace UniAPI
             //services.AddTransient<>();
 
             
-            var authenticatioSettings = new AuthenticationSettings();
+            var authenticationSettings = new AuthenticationSettings();
 
-            Configuration.GetSection("Authentication").Bind(authenticatioSettings);
+            Configuration.GetSection("Authentication").Bind(authenticationSettings);
 
             //Autoorization
 
-            services.AddSingleton(authenticatioSettings);
+            services.AddSingleton(authenticationSettings);
 
             services.AddAuthentication(option =>
             {
@@ -52,14 +54,23 @@ namespace UniAPI
                 cfg.SaveToken = true;
                 cfg.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuer = authenticatioSettings.JwtIssuer,
-                    ValidAudience = authenticatioSettings.JwtIssuer,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticatioSettings.JwtKey)),
+                    ValidIssuer = authenticationSettings.JwtIssuer,
+                    ValidAudience = authenticationSettings.JwtIssuer,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationSettings.JwtKey)),
                 };
             });
 
-
+            services.AddAuthorization(options => { 
+                options.AddPolicy("HasNationality", builder => builder.RequireClaim("Nationality","German","Polish"));
+                options.AddPolicy("Atleast20", builder => builder.AddRequirements(new MinimumAgeRequirment(20)));
+                options.AddPolicy("CreatedAtleast2Univeristy", builder => builder.AddRequirements(new CreateMultipleUniversityRequirment(2)));
             
+            });
+
+            //RequirmentHandler
+            services.AddScoped<IAuthorizationHandler, MinimumAgeRequirmentHandler>();
+            services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
+            services.AddScoped<IAuthorizationHandler, CreateMultipleUniversityRequirmentHandler>();
             //Validator
             services.AddControllers().AddFluentValidation();
             //DbContext
@@ -71,12 +82,15 @@ namespace UniAPI
             //Interface
             services.AddScoped<IAccountServices, AccountServices>();
             services.AddScoped<IUniversityService, UniversityService>();
+            services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IUserContextService, UserContextService>();
 
             //Middleware
             services.AddScoped<ErrorHandlingMiddleware>();
             services.AddScoped<RequestTimeMiddleware>();
-            //Swagger
-            services.AddSwaggerGen();
+          
+
+
 
             //Hasser
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
@@ -84,7 +98,11 @@ namespace UniAPI
             //Validetor
             services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 
-          
+            //ContextAccessor
+            services.AddHttpContextAccessor();
+
+            //Swagger
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -101,7 +119,7 @@ namespace UniAPI
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseMiddleware<RequestTimeMiddleware>();
 
-            //app.UseAuthentication();
+            app.UseAuthentication();
 
             app.UseHttpsRedirection();
 

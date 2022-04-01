@@ -30,9 +30,9 @@ namespace UniAPI.Services
             var newUser = new User()
             {
                 Email = dto.Email,
-                //BirthOfDate = dto.BirthOfDate,
+                DateOfBirth = dto.DateOfBirth,
                 Nationality = dto.Nationality,
-                //PasswordHash = dto.Password,
+                PasswordHash = dto.Password,
                 RoleId = dto.RoleId
 
             };
@@ -69,10 +69,11 @@ namespace UniAPI.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
                 new Claim(ClaimTypes.Role, $"{user.Role.Name} "),
-                //new Claim("DateOfBirth", user.DateOfBirth.Value.ToString("yyyy-mm--dd")),
+                //new Claim("DateOfBirth", user.DateOfBirth.Value.ToString("yyyy-MM--dd")),
                 new Claim("Nationality", user.Nationality),
             };
 
+           
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSetting.JwtKey));
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

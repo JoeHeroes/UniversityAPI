@@ -20,6 +20,11 @@ namespace UniAPI.Middleware
             {
                 await next.Invoke(context);
             }
+            catch (ForbidExeption forbidExeption)
+            {
+                context.Response.StatusCode = 403;
+                await context.Response.WriteAsync(forbidExeption.Message);
+            }
             catch (BadRequestException badRequestException)
             {
                 context.Response.StatusCode = 400;
