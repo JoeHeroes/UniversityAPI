@@ -83,6 +83,7 @@ namespace UniAPI
             services.AddScoped<IAccountServices, AccountServices>();
             services.AddScoped<IUniversityService, UniversityService>();
             services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IUserContextService, UserContextService>();
 
             //Middleware

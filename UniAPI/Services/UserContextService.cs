@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace UniAPI.Services
 {
+    public interface IUserContextService
+    {
+        int? GetUserId { get; }
+        ClaimsPrincipal User { get; }
+    }
 
     public class UserContextService : IUserContextService
     {
