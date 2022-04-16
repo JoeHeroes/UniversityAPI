@@ -21,12 +21,13 @@ namespace UniAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "HasNationality")]
-        public ActionResult<IEnumerable<UniversityDto>> GetAll()
+        //[Authorize(Policy = "HasNationality")]
+        [AllowAnonymous]
+        public ActionResult<IEnumerable<UniversityDto>> GetAll([FromQuery] UniversityQuery query)
         {
 
 
-            var uni = _service.GetAll();
+            var uni = _service.GetAll(query);
             return Ok(uni);
         }
 

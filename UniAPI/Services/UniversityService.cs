@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using UniAPI.Authorization.Policy;
 using UniAPI.Entites;
@@ -16,7 +18,7 @@ namespace UniAPI.Services
     {
         int Create(CreateUniversityDto dto);
         void Delete(int id);
-        IEnumerable<UniversityDto> GetAll();
+        PageResult<UniversityDto> GetAll(UniversityQuery query);
         UniversityDto GetById(int id);
         void Update(int id, UpdateUniversityDto dto);
     }
@@ -56,19 +58,50 @@ namespace UniAPI.Services
             return result;
         }
 
-        public IEnumerable<UniversityDto> GetAll()
+        public PageResult<UniversityDto> GetAll(UniversityQuery query)
         {
-            var uni = _dbContext
+
+            var baseQuery = _dbContext
                 .Universities
                 .Include(r => r.Address)
+                .Where(w => query.SearchPhrase == null || (w.Name.ToLower().Contains(query.SearchPhrase.ToLower()) || w.Description.ToLower().Contains(query.SearchPhrase.ToLower())));
+
+            if (!string.IsNullOrEmpty(query.SortBy))
+            {
+
+                var columnSelector = new Dictionary<string, Expression<Func<University, object>>>
+                {
+                    { nameof(University.Name), r => r.Name},
+                    { nameof(University.Description), r => r.Description},
+                    { nameof(University.Type), r => r.Type},
+                };
+
+                var selectedColumn = columnSelector[query.SortBy];
+
+                baseQuery = query.SortDirection == SortDirection.ASC 
+                    ? baseQuery.OrderBy(selectedColumn) 
+                    : baseQuery.OrderByDescending(selectedColumn);
+            }
+
+            var uni = baseQuery
+                .Skip(query.PageSize*(query.PageNumber-1))
+                .Take(query.PageSize)
                 .ToList();
+
+            var totalItemCount = baseQuery.Count();
 
             if (uni is null)
             {
                 throw new NotFoundException("Restaurant not found");
             }
 
-            var result = _mapper.Map<List<UniversityDto>>(uni);
+            var resultUni = _mapper.Map<List<UniversityDto>>(uni);
+
+
+            var result = new PageResult<UniversityDto>(resultUni, totalItemCount, query.PageSize, query.PageNumber);
+
+
+
 
             return result;
         }

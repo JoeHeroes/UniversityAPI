@@ -98,6 +98,7 @@ namespace UniAPI
 
             //Validetor
             services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
+            services.AddScoped<IValidator<UniversityQuery>, UniversityQueryValidator>();
 
             //ContextAccessor
             services.AddHttpContextAccessor();

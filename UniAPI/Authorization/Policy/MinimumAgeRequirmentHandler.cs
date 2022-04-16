@@ -24,7 +24,7 @@ namespace UniAPI.Authorization.Policy
 
             _logger.LogInformation($"User: {userEmail} with date of birth [{dateOfBirth}]");
 
-            if (dateOfBirth.AddDays(requirement.MinAge) < DateTime.Today)
+            if (dateOfBirth.AddDays(requirement.MinAge) <= DateTime.Today)
             {
                 _logger.LogInformation("Authorization succedded");
                 context.Succeed(requirement);
