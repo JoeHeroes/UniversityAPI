@@ -121,6 +121,8 @@ namespace UniAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UniversitySeeder seeder)
         {
+            app.UseResponseCaching();
+
             app.UseStaticFiles();
 
             app.UseCors("FrontEndClient");
