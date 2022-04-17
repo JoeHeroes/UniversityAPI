@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using UniAPI.Authorization;
 using UniAPI.Entites;
@@ -17,6 +18,12 @@ namespace UniAPI.Seeder
             if (_dbContext.Database.CanConnect())
             {
 
+                var pendingMigrations = _dbContext.Database.GetPendingMigrations();
+
+                if(pendingMigrations != null && pendingMigrations.Any())
+                {
+                    _dbContext.Database.Migrate();
+                }
 
                 if (!_dbContext.Roles.Any())
                 {

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -73,8 +74,6 @@ namespace UniAPI
             services.AddScoped<IAuthorizationHandler, CreateMultipleUniversityRequirmentHandler>();
             //Validator
             services.AddControllers().AddFluentValidation();
-            //DbContext
-            services.AddDbContext<UniversityDbContext>();
             //Sedder
             services.AddScoped<UniversitySeeder>();
             //Mapper
@@ -115,6 +114,8 @@ namespace UniAPI
                 )
                 );
 
+            //DbContext
+            services.AddDbContext<UniversityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RestaurantDbConection")));
 
         }
 

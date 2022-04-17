@@ -5,8 +5,10 @@ namespace UniAPI.Entites
 {
     public class UniversityDbContext: DbContext
     {
-        private string _connectionString = "Server=(localdb)\\mssqllocaldb;Database=UniversityDB; Trusted_Connection=True";
+        public UniversityDbContext(DbContextOptions<UniversityDbContext> options):base(options)
+        {
 
+        }
 
         public DbSet<University> Universities { get; set; }
         public DbSet<Address> Addresses { get; set; }
@@ -56,9 +58,5 @@ namespace UniAPI.Entites
              .HasMaxLength(25);
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_connectionString);
-        }
     }
 }
