@@ -37,7 +37,7 @@ namespace UniAPI
             
             var authenticationSettings = new AuthenticationSettings();
 
-            Configuration.GetSection("Authentication").Bind(authenticationSettings)
+            Configuration.GetSection("Authentication").Bind(authenticationSettings);
 
             //Autoorization
 
