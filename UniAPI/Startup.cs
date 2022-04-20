@@ -30,18 +30,14 @@ namespace UniAPI
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddTransient<>();
-
-            
+            //services.AddTransient<>();           
             var authenticationSettings = new AuthenticationSettings();
 
             Configuration.GetSection("Authentication").Bind(authenticationSettings);
 
             //Autoorization
-
             services.AddSingleton(authenticationSettings);
 
             services.AddAuthentication(option =>
@@ -88,9 +84,6 @@ namespace UniAPI
             //Middleware
             services.AddScoped<ErrorHandlingMiddleware>();
             services.AddScoped<RequestTimeMiddleware>();
-          
-
-
 
             //Hasser
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
@@ -111,8 +104,7 @@ namespace UniAPI
                 builder.AllowAnyMethod()
                 .AllowAnyHeader()
                 .WithOrigins(Configuration["AllowedOrigins"])
-                )
-                );
+                ));
 
             //DbContext
             services.AddDbContext<UniversityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RestaurantDbConection")));
@@ -129,7 +121,6 @@ namespace UniAPI
             app.UseCors("FrontEndClient");
 
             seeder.Seed();
-
 
             if (env.IsDevelopment())
             {
