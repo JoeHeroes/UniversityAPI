@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,18 +30,14 @@ namespace UniAPI
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddTransient<>();
-
-            
+            //services.AddTransient<>();           
             var authenticationSettings = new AuthenticationSettings();
 
             Configuration.GetSection("Authentication").Bind(authenticationSettings);
 
             //Autoorization
-
             services.AddSingleton(authenticationSettings);
 
             services.AddAuthentication(option =>
@@ -73,8 +70,6 @@ namespace UniAPI
             services.AddScoped<IAuthorizationHandler, CreateMultipleUniversityRequirmentHandler>();
             //Validator
             services.AddControllers().AddFluentValidation();
-            //DbContext
-            services.AddDbContext<UniversityDbContext>();
             //Sedder
             services.AddScoped<UniversitySeeder>();
             //Mapper
@@ -89,9 +84,6 @@ namespace UniAPI
             //Middleware
             services.AddScoped<ErrorHandlingMiddleware>();
             services.AddScoped<RequestTimeMiddleware>();
-          
-
-
 
             //Hasser
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
@@ -112,9 +104,10 @@ namespace UniAPI
                 builder.AllowAnyMethod()
                 .AllowAnyHeader()
                 .WithOrigins(Configuration["AllowedOrigins"])
-                )
-                );
+                ));
 
+            //DbContext
+            services.AddDbContext<UniversityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RestaurantDbConection")));
 
         }
 
@@ -128,7 +121,6 @@ namespace UniAPI
             app.UseCors("FrontEndClient");
 
             seeder.Seed();
-
 
             if (env.IsDevelopment())
             {
