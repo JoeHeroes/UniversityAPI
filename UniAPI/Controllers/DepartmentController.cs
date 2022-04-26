@@ -29,6 +29,7 @@ namespace UniAPI.Controllers
         }
 
         [HttpGet("{depId}")]
+        [AllowAnonymous]
         public ActionResult<DepartmentDto> GetOne([FromRoute] int id, [FromRoute] int depId)
         {
             var uni = _service.GetById(id, depId);

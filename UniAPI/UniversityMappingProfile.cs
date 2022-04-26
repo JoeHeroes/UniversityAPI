@@ -22,7 +22,7 @@ namespace UniAPI
             CreateMap<CreateUniversityDto, University>()
             .ForMember(m => m.Address, c => c.MapFrom(dto => new Address() { City = dto.City, PostalCode = dto.PostalCode, Street = dto.PostalCode }));
 
-
+            CreateMap<Department, DepartmentDto>();
 
         }
 
