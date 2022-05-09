@@ -46,8 +46,6 @@ namespace UniAPI.TEST
         [Fact]
         public async Task RegisterUser_ForValidModel_ReturnOK()
         {
-
-
             _accountMocService
                 .Setup(e => e.GeneratJwt(It.IsAny<LoginDto>()))
                 .Returns("jwt");
@@ -62,9 +60,7 @@ namespace UniAPI.TEST
 
             };
 
-
             var httpContent = registerUser.ToJsonHttpContent();
-
 
             //act
 
@@ -73,6 +69,32 @@ namespace UniAPI.TEST
             //assert
 
             respone.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        }
+
+
+
+
+        [Fact]
+        public async Task RegisterUser_ForValidModel_ReturnBadRequest()
+        {
+            //arrange
+
+            var registerUser = new RegisterUserDto()
+            {
+                Password = "password123",
+                ConfirmPassword = "password123"
+
+            };
+
+            var httpContent = registerUser.ToJsonHttpContent();
+
+            //act
+
+            var respone = await _client.PostAsync("/api/account/register", httpContent);
+
+            //assert
+
+            respone.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
         }
 
 
@@ -100,30 +122,31 @@ namespace UniAPI.TEST
 
 
 
+
         [Fact]
-        public async Task RegisterUser_ForValidModel_ReturnBadRequest()
+        public async Task LoginUser_ForRegisterUser_ReturnX()
         {
             //arrange
 
-            var registerUser = new RegisterUserDto()
+            var loginDto = new LoginDto()
             {
-                Password = "password123",
-                ConfirmPassword = "password123"
+                Email = "strin1g@wp.pl",
+                Password = "string123456"
 
             };
 
-
-            var httpContent = registerUser.ToJsonHttpContent();
-
+            var httpContent = loginDto.ToJsonHttpContent();
 
             //act
 
-            var respone = await _client.PostAsync("/api/account/register", httpContent);
+            var respone = await _client.PostAsync("/api/account/login", httpContent);
 
             //assert
 
-            respone.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+            respone.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
         }
+
+
 
     }
 }
