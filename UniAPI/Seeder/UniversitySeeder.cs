@@ -17,7 +17,7 @@ namespace UniAPI.Seeder
         {
             if (_dbContext.Database.CanConnect())
             {
-
+                /*
                 if (_dbContext.Database.IsRelational())
                 {
                     var pendingMigrations = _dbContext.Database.GetPendingMigrations();
@@ -27,7 +27,7 @@ namespace UniAPI.Seeder
                         _dbContext.Database.Migrate();
                     }
                 }
-               
+               */
 
                 if (!_dbContext.Roles.Any())
                 {
